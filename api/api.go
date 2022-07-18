@@ -2,11 +2,10 @@ package api
 
 import (
 	"errors"
+	"fasttrack_api/model"
+	"fmt"
 	"net/http"
 	"strconv"
-	"fasttrack_api/model"
-
-
 
 	"github.com/gin-gonic/gin"
 )
@@ -41,6 +40,30 @@ func getUsers(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, users)
 }
 
+//getUsers list of all users as JSON.
+func getUserById(c *gin.Context) {
+	userid, err := strconv.ParseInt(c.Param("userid"), 10, 0)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	message := users[userid-1]
+	c.IndentedJSON(http.StatusOK, message)
+}
+
+//getUsers list of all users as JSON.
+func getQuestionById(c *gin.Context) {
+	userid, err := strconv.ParseInt(c.Param("userid"), 10, 0)
+	questionid, err := strconv.ParseInt(c.Param("questionid"), 10, 0)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	user := users[userid-1]
+	message := user.Quiz[questionid-1]
+
+	c.IndentedJSON(http.StatusOK, message)
+}
+
 //Post method to register a new user
 func registerUser(c *gin.Context) {
 	var newUser model.Registred_user
@@ -62,7 +85,8 @@ func registerUser(c *gin.Context) {
 	newUser.Number_corrected_answers = 0
 	newUser.User_rated = 0.00
 	users = append(users, newUser)
-	c.IndentedJSON(http.StatusCreated, "user created sucessfully")
+	// c.IndentedJSON(http.StatusCreated, "user created sucessfully")
+	c.JSON(http.StatusCreated, "user created sucessfully")
 }
 
 var port string = "8080"
@@ -75,6 +99,8 @@ func StartServer() {
 	router := gin.Default()
 	router.GET("/questions", getQuestions)
 	router.GET("/users", getUsers)
+	router.GET("/user/:userid", getUserById)
+	router.GET("/user/:userid/:questionid", getQuestionById)
 	router.POST("/user", registerUser)
 	router.Run("localhost:" + port)
 }
