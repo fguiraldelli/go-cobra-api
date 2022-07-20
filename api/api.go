@@ -32,12 +32,12 @@ func verifyEmail(new_email string, existed_email string) error {
 
 //getQuestions responds with the list of all questions as JSON.
 func getQuestions(c *gin.Context) {
-	c.IndentedJSON(http.StatusOK, questions)
+	c.JSON(http.StatusOK, questions)
 }
 
 //getUsers list of all users as JSON.
 func getUsers(c *gin.Context) {
-	c.IndentedJSON(http.StatusOK, users)
+	c.JSON(http.StatusOK, users)
 }
 
 //getUsers list of all users as JSON.
@@ -47,7 +47,7 @@ func getUserById(c *gin.Context) {
 		fmt.Println(err.Error())
 	}
 	message := users[userid-1]
-	c.IndentedJSON(http.StatusOK, message)
+	c.JSON(http.StatusOK, message)
 }
 
 //getUsers list of all users as JSON.
@@ -61,7 +61,22 @@ func getQuestionById(c *gin.Context) {
 	user := users[userid-1]
 	message := user.Quiz[questionid-1]
 
-	c.IndentedJSON(http.StatusOK, message)
+	c.JSON(http.StatusOK, message)
+}
+
+//getUsers list of all users as JSON.
+func getUserByEmail(c *gin.Context) {
+	email := c.Param("userid")
+
+	//find user by email.
+	for _, existed_user := range users {
+		if existed_user.Email == email {
+			c.JSON(http.StatusOK, existed_user)
+			return
+		}
+	}
+
+	c.JSON(http.StatusNotFound, gin.H{"message": "user does not exist."})
 }
 
 //Post method to register a new user
@@ -76,7 +91,7 @@ func registerUser(c *gin.Context) {
 	//add a new user to the users slice.
 	for _, existed_user := range users {
 		if err := verifyEmail(existed_user.Email, newUser.Email); err != nil {
-			c.IndentedJSON(http.StatusConflict, gin.H{"message": err.Error()})
+			c.JSON(http.StatusConflict, gin.H{"message": err.Error()})
 			return
 		}
 	}
@@ -85,7 +100,7 @@ func registerUser(c *gin.Context) {
 	newUser.Number_corrected_answers = 0
 	newUser.User_rated = 0.00
 	users = append(users, newUser)
-	// c.IndentedJSON(http.StatusCreated, "user created sucessfully")
+	// c.JSON(http.StatusCreated, "user created sucessfully")
 	c.JSON(http.StatusCreated, "user created sucessfully")
 }
 
@@ -100,6 +115,7 @@ func StartServer() {
 	router.GET("/questions", getQuestions)
 	router.GET("/users", getUsers)
 	router.GET("/user/:userid", getUserById)
+	router.GET("/user/:userid/email", getUserByEmail)
 	router.GET("/user/:userid/:questionid", getQuestionById)
 	router.POST("/user", registerUser)
 	router.Run("localhost:" + port)

@@ -8,6 +8,7 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/json"
+	"fasttrack_api/model"
 	"fmt"
 	"io"
 	"log"
@@ -41,7 +42,7 @@ var startQuizCmd = &cobra.Command{
 
 		switch input {
 		case 1:
-			
+
 			values := map[string]string{"name": name, "email": email}
 			json_data, err := json.Marshal(values)
 
@@ -57,7 +58,22 @@ var startQuizCmd = &cobra.Command{
 			}
 
 		case 2:
-			fmt.Println("Caso 2")
+			response, _ := http.Get("http://localhost:8080/user/" + email + "/email")
+
+			if response.StatusCode == http.StatusOK {
+				body, _ := io.ReadAll(response.Body)
+				fmt.Println(string(body))
+
+				var user model.Registred_user
+				err := json.Unmarshal([]byte(body), &user)
+
+				if err != nil {
+					panic(err)
+				}
+
+				fmt.Printf("\n\n json object:::: %+v", string(body))
+			}
+
 		}
 
 	},
@@ -65,14 +81,16 @@ var startQuizCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(startQuizCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// startQuizCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// startQuizCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
+
+//Show menu to create a new user, start the quiz with an existed user or exit the program.
+func startMenu() {}
+
+//Register a new user into the API.
+func registerUser() {}
+
+//Start the quiz with an existed user.
+func startQuiz() {}
+
+//Cleans the Screen
+func clearScreen() {}
