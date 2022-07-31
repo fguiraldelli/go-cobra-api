@@ -104,6 +104,30 @@ func registerUser(c *gin.Context) {
 	c.JSON(http.StatusCreated, "user created sucessfully")
 }
 
+//Post method to register a new user
+func updateUserQuestions(c *gin.Context) {
+	email := c.Param("userid")
+	var existed_user model.Registred_user
+
+	//Call a BindJson to bind  the received JSON to questions
+	if err := c.BindJSON(&existed_user); err != nil {
+		return
+	}
+
+	//find user by email and set questions and numbers of corrected answers
+	for i := 0; i < len(users); i++ {
+		if users[i].Email == email {
+			users[i].Quiz = existed_user.Quiz
+			users[i].Number_corrected_answers = existed_user.Number_corrected_answers
+			c.JSON(http.StatusOK, users[i])
+			return
+		}
+
+	}
+
+	c.JSON(http.StatusNotFound, gin.H{"message": "user does not exist."})
+}
+
 var port string = "8080"
 
 func SetPortFlag(serverPort string) {
@@ -116,6 +140,7 @@ func StartServer() {
 	router.GET("/users", getUsers)
 	router.GET("/user/:userid", getUserById)
 	router.GET("/user/:userid/email", getUserByEmail)
+	router.POST("/user/:userid/questions", updateUserQuestions)
 	router.GET("/user/:userid/:questionid", getQuestionById)
 	router.POST("/user", registerUser)
 	router.Run("localhost:" + port)
