@@ -155,10 +155,12 @@ func calculateRateUsers() {
 	}
 	for i := 0; i < len(users); i++ {
 		users[i].User_rated = 0.0
-		for j := 0; j < users[i].Number_corrected_answers; j++ {
-			users[i].User_rated += float64(rate[j])
+		if users[i].Number_corrected_answers != 0 {
+			for j := 0; j < users[i].Number_corrected_answers; j++ {
+				users[i].User_rated += float64(rate[j])
+			}
+			users[i].User_rated = users[i].User_rated / float64(total_answered_question) * 100
 		}
-		users[i].User_rated = users[i].User_rated / float64(total_answered_question) * 100
 	}
 }
 

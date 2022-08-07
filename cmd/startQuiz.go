@@ -39,10 +39,12 @@ func init() {
 
 //Show menu to create a new user, start the quiz with an existed user or exit the program.
 func startMenu() {
+	clearScreen()
 	fmt.Println("Choose an option to continue:")
 	fmt.Println("1: Register a new user")
 	fmt.Println("2: Start quiz")
-	fmt.Println("3: Exit quiz app")
+	fmt.Println("3: Show your statistics")
+	fmt.Println("4: Exit quiz app")
 
 	var userInput int
 	fmt.Scanln(&userInput)
@@ -52,9 +54,10 @@ func startMenu() {
 	case 2:
 		startQuiz()
 	case 3:
-		os.Exit(1)
+		showUserStatistics()
+		startMenu()
 	case 4:
-		updateUserQuestions()
+		os.Exit(1)
 	default:
 		fmt.Println(" Invalid option.")
 
@@ -128,16 +131,18 @@ func startQuiz() {
 
 	updateUserQuestions()
 
+	showUserStatistics()
+
+	startMenu()
+}
+
+func showUserStatistics() {
+	clearScreen()
 	fmt.Println("Number of corrected answers: ", user.Number_corrected_answers)
 	fmt.Println("You scored higher than ", int(user.User_rated), "% of all quizzers")
 
 	fmt.Println("Press enter to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
-
-	fmt.Println(user.Quiz)
-
-	clearScreen()
-	startMenu()
 }
 
 //Register a new user into the API.
@@ -161,7 +166,7 @@ func updateUserQuestions() {
 	clearScreen()
 }
 
-//Cleans the Screen
+//Clear the Screen
 func clearScreen() {
 	cs := exec.Command("clear")
 	cs.Stdout = os.Stdout
@@ -180,8 +185,6 @@ func getUserQuestions(email string) *model.Registred_user {
 		if err != nil {
 			panic(err)
 		}
-
-		fmt.Printf("\n\n json object:::: %+v", string(body))
 
 	}
 	return &user
