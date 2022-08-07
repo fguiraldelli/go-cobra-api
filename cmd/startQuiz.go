@@ -30,58 +30,6 @@ var startQuizCmd = &cobra.Command{
 
 		clearScreen()
 		startMenu()
-		/*
-			var name string
-			var email string
-			var input int
-
-			fmt.Println("Type your full name and press enter:")
-			scanner := bufio.NewScanner(os.Stdin)
-			scanner.Scan()
-			name = scanner.Text()
-
-			fmt.Println("Type your e-mail and press enter:")
-			fmt.Scanf("%s", &email)
-
-			fmt.Println("Type 1 for register a new user or Type 2 for login using your e-mail")
-			fmt.Scanf("%d", &input)
-
-			switch input {
-			case 1:
-
-				values := map[string]string{"name": name, "email": email}
-				json_data, err := json.Marshal(values)
-
-				if err != nil {
-					log.Fatal(err)
-				}
-
-				response, _ := http.Post("http://localhost:8080/user/", "application/json", bytes.NewBuffer(json_data))
-
-				if response.StatusCode == http.StatusCreated {
-					body, _ := io.ReadAll(response.Body)
-					fmt.Println(string(body))
-				}
-
-			case 2:
-				response, _ := http.Get("http://localhost:8080/user/" + email + "/email")
-
-				if response.StatusCode == http.StatusOK {
-					body, _ := io.ReadAll(response.Body)
-					fmt.Println(string(body))
-
-					var user model.Registred_user
-					err := json.Unmarshal([]byte(body), &user)
-
-					if err != nil {
-						panic(err)
-					}
-
-					fmt.Printf("\n\n json object:::: %+v", string(body))
-				}
-
-			}
-		*/
 	},
 }
 
@@ -180,7 +128,8 @@ func startQuiz() {
 
 	updateUserQuestions()
 
-	fmt.Printf("Number of corrected answers: %d\n", +user.Number_corrected_answers)
+	fmt.Println("Number of corrected answers: ", user.Number_corrected_answers)
+	fmt.Println("You scored higher than ", int(user.User_rated), "% of all quizzers")
 
 	fmt.Println("Press enter to continue...")
 	bufio.NewReader(os.Stdin).ReadBytes('\n')
@@ -203,7 +152,10 @@ func updateUserQuestions() {
 
 	if response.StatusCode == http.StatusOK {
 		body, _ := io.ReadAll(response.Body)
-		fmt.Println(string(body))
+		err := json.Unmarshal([]byte(body), &user)
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	clearScreen()

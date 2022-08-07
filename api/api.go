@@ -10,9 +10,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var rate = make(map[int]int)
+
 var users = []model.Registred_user{
-	{ID: "1", Name: "John Doe", Email: "doe.jonh@hotmail.com", Quiz: questions, Number_corrected_answers: 0, User_rated: 0.00},
-	{ID: "2", Name: "Jane Doe", Email: "janedoe1989@gmail.com", Quiz: questions, Number_corrected_answers: 0, User_rated: 0.00},
+	{ID: "1", Name: "John Doe", Email: "doe.jonh@hotmail.com", Quiz: questions, Number_corrected_answers: 5, User_rated: 0.00},
+	{ID: "2", Name: "Jane Doe", Email: "janedoe1989@gmail.com", Quiz: questions, Number_corrected_answers: 4, User_rated: 0.00},
+	{ID: "3", Name: "John Does", Email: "does.jonh@hotmail.com", Quiz: questions, Number_corrected_answers: 3, User_rated: 0.00},
+	{ID: "4", Name: "Jane Does", Email: "janedoes1999@gmail.com", Quiz: questions, Number_corrected_answers: 2, User_rated: 0.00},
+	{ID: "5", Name: "John Foe", Email: "foe.jonh@hotmail.com", Quiz: questions, Number_corrected_answers: 1, User_rated: 0.00},
+	{ID: "6", Name: "Jane Foe", Email: "janefoe1979@gmail.com", Quiz: questions, Number_corrected_answers: 0, User_rated: 0.00},
+	{ID: "7", Name: "John Toe", Email: "toe.jonh@hotmail.com", Quiz: questions, Number_corrected_answers: 5, User_rated: 0.00},
+	{ID: "8", Name: "Jane Toe", Email: "jantoe1984@gmail.com", Quiz: questions, Number_corrected_answers: 4, User_rated: 0.00},
+	{ID: "9", Name: "John Hoe", Email: "hoe.jonh@hotmail.com", Quiz: questions, Number_corrected_answers: 3, User_rated: 0.00},
+	{ID: "10", Name: "Jane Hoe", Email: "janehoe1988@gmail.com", Quiz: questions, Number_corrected_answers: 2, User_rated: 0.00},
 }
 
 var questions = []model.Question{
@@ -104,7 +114,7 @@ func registerUser(c *gin.Context) {
 	c.JSON(http.StatusCreated, "user created sucessfully")
 }
 
-//Post method to register a new user
+//Post method to store user response
 func updateUserQuestions(c *gin.Context) {
 	email := c.Param("userid")
 	var existed_user model.Registred_user
@@ -119,6 +129,7 @@ func updateUserQuestions(c *gin.Context) {
 		if users[i].Email == email {
 			users[i].Quiz = existed_user.Quiz
 			users[i].Number_corrected_answers = existed_user.Number_corrected_answers
+			calculateRateUsers()
 			c.JSON(http.StatusOK, users[i])
 			return
 		}
@@ -134,7 +145,25 @@ func SetPortFlag(serverPort string) {
 	port = serverPort
 }
 
+//Calculate users rate
+func calculateRateUsers() {
+	rate = make(map[int]int)
+	total_answered_question := 0
+	for i := 0; i < len(users); i++ {
+		rate[users[i].Number_corrected_answers]++
+		total_answered_question++
+	}
+	for i := 0; i < len(users); i++ {
+		users[i].User_rated = 0.0
+		for j := 0; j < users[i].Number_corrected_answers; j++ {
+			users[i].User_rated += float64(rate[j])
+		}
+		users[i].User_rated = users[i].User_rated / float64(total_answered_question) * 100
+	}
+}
+
 func StartServer() {
+	calculateRateUsers()
 	router := gin.Default()
 	router.GET("/questions", getQuestions)
 	router.GET("/users", getUsers)
