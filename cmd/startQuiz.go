@@ -113,11 +113,12 @@ func startQuiz() {
 				answer_sheet[i] = alternative
 			}
 
-			var choice int
+			var ans_choosen int
 			fmt.Println("Input a number between 1-5 to answer.")
-			fmt.Scanln(&choice)
-			fmt.Printf("Your choice was: %d\n\n", choice)
-			if answer_sheet[choice-1] == question.Correct_answer {
+			fmt.Scanln(&ans_choosen)
+			ans_choosen = inputValidation(ans_choosen)
+			fmt.Printf("Your answer was: %d\n\n", ans_choosen)
+			if answer_sheet[ans_choosen-1] == question.Correct_answer {
 				user.Quiz[i].Is_corrected = true
 				user.Number_corrected_answers++
 			}
@@ -164,6 +165,19 @@ func updateUserQuestions() {
 	}
 
 	clearScreen()
+}
+
+//Verifies valid input in answer a question
+func inputValidation(input int) int {
+	if (input >= 1) && (input <= 5) {
+		fmt.Print(input)
+		return input
+	} else {
+		fmt.Println("Input not valid!")
+		fmt.Println("Please, input a number between 1-5 to answer.")
+		fmt.Scanln(&input)
+		return inputValidation(input)
+	}
 }
 
 //Clear the Screen
