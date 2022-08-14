@@ -33,6 +33,7 @@ var questions = []model.Question{
 	{ID: "5", Question: "Question 5", Answers: []string{"E1", "E2", "E3", "E4", "E5"}, Correct_answer: "E3", Answered: false, Is_corrected: false},
 }
 
+//returns an error with emails are equals
 func verifyEmail(new_email string, existed_email string) error {
 	if new_email == existed_email {
 		return errors.New("this e-mail already exists")
