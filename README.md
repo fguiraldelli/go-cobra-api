@@ -10,7 +10,7 @@ The main demanded user stories and use cases for this project is described below
     
     - User should be able to select just one answer per question;
     
-    - User should be able to answer all the questions and then post his/her answers and get back how manu correct answers there had and be displayed to the user;
+    - User should be able to answer all the questions and then post his/her answers and get back how many correct answers there had and be displayed to the user;
     
     - User should see how good he/she rated compared to others that had taken the quiz, e.g. "You scored higher than 60% of all quizzers".
 
